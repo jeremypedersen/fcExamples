@@ -1,4 +1,4 @@
 runtime: python3
 tasks:
   - name: install certbot
-    apt: certbot
+    pip: certbot
