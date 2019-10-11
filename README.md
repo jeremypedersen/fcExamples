@@ -8,6 +8,6 @@ The code here is licensed under an MIT license. Feel free to reuse and adapt to 
 
 # Structure of this Repository
 
-Each set of example code is held in a subdirectory, for example `url-to-title` holds a toy Python3 function that takes URLs as input and outputs the contents of the <title> tag on the page pointed to by the input URL.
+Each set of example code is held in a subdirectory, for example `url-to-title` holds a toy Python 3 function that takes URLs as input and outputs the contents of the <title> tag on the page pointed to by the input URL.
 
 Most examples will include a README explaining how to set up and use the code.
