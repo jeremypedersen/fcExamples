@@ -11,7 +11,7 @@ The code is loosely based on this Alibaba Cloud blog article: [Develop Function 
 
 ## How To Use This Code
 
-You'll need to have the `funfun ` and `fcli` commands installed. Further, the `fun` command requires Docker to be installed in order for `fun install` to work, so be sure to install Docker as well!
+You'll need to have the `fun ` and `fcli` commands installed. Further, the `fun` command requires Docker to be installed in order for `fun install` to work, so be sure to install Docker as well!
  
 There are *3 steps* to use this code:
 
