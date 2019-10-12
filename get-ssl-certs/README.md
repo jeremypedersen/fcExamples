@@ -1,6 +1,6 @@
 # Get SSL Certificates
 
-- Status: Code tested and working as of 2019-10-11
+- Status: Code still under test, not ready to use
 
 ## What
 
