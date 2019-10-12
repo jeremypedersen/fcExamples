@@ -1,8 +1,40 @@
+# Libraries for error reporting and event parsing
 import logging
-import os
+import json
 
-# A simple Function Compute function to renew Let's Encrypt
-# certificates using certbot, and bind them to an OSS bucket
+# Libraries needed to make ACME work (so we can get our 
+# nice new SSL cert)
+from contextlib import contextmanager
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import rsa
+import OpenSSL
+
+from acme import challenges
+from acme import client
+from acme import crypto_util
+from acme import errors
+from acme import messages
+from acme import standalone
+import josepy as jose
+
+#
+# Let's Encrypt SSL Certificate Handler
+#
+# Purpose: Create an easy way to renew SSL certificates
+# bound to a static site hosted in an Alibaba Cloud OSS 
+# bucket, without the need to leave a server running 
+# all the time
+#
+# What it does:
+# 1 - Create account on Let's Encrypt, and get an account key
+# 2 - Generate a challenge file (HTTP-01 ACME challenge)
+# 3 - Place challenge file into OSS bucket hosting our website
+# 4 - Get certificate (private key, full chain)
+# 5 - Install certificate
+# 6 - Clean up ACME challenge files by deleting them from OSS bucket
+#
+# Code borrows heavily from the HTTP-01 challenge example code here:
+# https://github.com/certbot/certbot/blob/master/acme/examples/http01_example.py
 def handler(event, context):
 
   # Get logging info
@@ -25,68 +57,22 @@ def handler(event, context):
     response = 'ERROR: Unable to convert event string to valid JSON'
     return response
 
-  #
-  # Write auth and cleanup shellscripts to disk, for use
-  # in subsequent call to certbot
-  #
-  auth = '''
-#!/bin/bash
-
-echo "============ BEGIN AUTH OUTPUT ============="
-echo $CERTBOT_DOMAIN
-echo $CERTBOT_VALIDATION
-echo $CERTBOT_TOKEN
-echo "============ END AUTH OUTPUT ============="
-  '''
-
-  try:
-    f = open('auth.sh', 'w')
-    f.write(auth)
-    f.close()
-  except:
-    response = 'ERROR: Failed to write auth script to local environment in FC'
-    return response
-
-  cleanup = '''
-#!/bin/bash
-
-echo "============ BEGIN CLEANUP OUTPUT ============="
-echo $CERTBOT_AUTH_OUTPUT
-echo "============ END CLEANUP OUTPUT ============="
-  '''
-
-  try:
-    f = open('cleanup.sh', 'w')
-    f.write(cleanup)
-    f.close()
-  except:
-    response = 'ERROR: Failed to write cleanup script to local environment in FC'
-    return response
-
-  #
-  # Make shellscripts executable
   # 
-  os.system('chmod ugo+x auth.sh')
-  os.system('chmod ugo+x cleanup.sh')
+  # Determine whether or not a certificate has already been generated, 
+  # and if yes, whether it needs to be renewed
+  #
 
   #
-  # Make call to certbot
+  # Begin certificate challenge process
+  #
+
+  #
+  # Install certificates
+  #
+
+  #
+  # Remove files created by HTTP-01 challenge
   # 
-  certCommand = '''
-  certbot certonly --manual --preferred-challenges http --agree-tos --manual-public-ip-logging-ok --config-dir . --work-dir . --logs-dir . -n --manual-auth-hook ./auth.sh --manual-cleanup-hook ./cleanup.sh -m dummyemail@dummy.com -d somedomain.com --dry-run
-  '''
-  os.system(certCommand)
 
-  #
-  # Send certbot log file to Log Service
-  #
-  try:
-    f = open('letsencrypt.log', 'r')
-    raw_logs = f.read()
-    f.close()
-    logger.info(raw_logs)
-  except:
-    response = 'Function completed, but unable to write letsencrypt.log out to log service'
-    return response
 
-  return 'Certificate renewal complete! Check logs for details'
+  return response
